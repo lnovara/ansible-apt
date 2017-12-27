@@ -1,0 +1,56 @@
+---
+
+# packages to provide additional functionalities
+apt_packages: [apt-transport-https]
+
+# remove /etc/apt/sources.list
+apt_remove_sources: yes
+
+# remove every file under /etc/apt/sources.list.d
+apt_remove_sources_d: no
+
+# remove /etc/apt/apt.conf
+apt_remove_conf: yes
+
+# remove every file under /etc/apt/apt.conf.d
+apt_remove_conf_d: no
+
+# remove /etc/apt/preferences
+apt_remove_preferences: yes
+
+# remove every file under /etc/apt/preferences.d
+apt_remove_preferences_d: no
+
+# list of default APT sources
+apt_sources_default:
+  - name: debian
+    uri: https://deb.debian.org/debian
+    suites:
+      - "{{ ansible_distribution_release | lower }}"
+    components:
+      - main
+    options: {}
+    src: yes
+    gpg_fingerprint: null
+    gpg_keyserver: null
+    gpg_url: null
+  - name: debian-security
+    uri: https://deb.debian.org/debian-security
+    suites:
+      - "{{ ansible_distribution_release | lower }}/updates"
+    components:
+      - main
+    options: {}
+    src: yes
+    gpg_fingerprint: null
+    gpg_keyserver: null
+    gpg_url: null
+
+# list of user-supplied APT sources
+apt_sources_custom: []
+
+# list of files to add under /etc/apt/apt.conf.d
+apt_conf_files: []
+
+# list of files to add under /etc/apt/preferences.d
+apt_preferences_files: []

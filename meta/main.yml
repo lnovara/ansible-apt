@@ -1,0 +1,21 @@
+---
+
+galaxy_info:
+  author: Luca Novara
+  description: Setup APT repositories, configuration snippets and pinning.
+  company:
+  license: MIT
+  min_ansible_version: 2.4
+  issue_tracker_url: https://github.com/lnovara/ansible-apt/issues
+
+  platforms:
+    - name: Debian
+      versions:
+        - stretch
+
+  galaxy_tags:
+    - apt
+    - debian
+    - system
+
+dependencies: []

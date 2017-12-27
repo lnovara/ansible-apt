@@ -1,0 +1,6 @@
+{{ ansible_managed | comment }}
+
+Package: *
+Pin: origin {{ item.uri | urlsplit("hostname") }}
+Pin-Priority: 100
+

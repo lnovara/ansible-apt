@@ -1,0 +1,16 @@
+{{ ansible_managed | comment }}
+
+{% if item.src is defined and item.src %}
+Types: deb deb-src
+{% else %}
+Types: deb
+{% endif %}
+URIs: {{ item.uri }}
+Suites: {{ item.suites | join(" ") }}
+Components: {{ item.components | join(" ") }}
+{% if item.gpg_fingerprint is defined and item.gpg_fingerprint %}
+Signed-By:  /usr/share/keyrings/{{ item.name }}.gpg
+{% endif %}
+{% for key, value in item.options | default({}) | dictsort %}
+{{ key }}: {{ value }}
+{% endfor %}

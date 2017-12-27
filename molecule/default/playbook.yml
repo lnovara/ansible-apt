@@ -1,0 +1,26 @@
+---
+- name: Converge
+  hosts: all
+
+  pre_tasks:
+    - name: Create test APT configuration snippet
+      copy:
+        content: >
+          APT::Install-Recommends '0';
+        dest: /tmp/99norecommends
+      delegate_to: 127.0.0.1
+
+    - name: Create test APT pinning snippet
+      copy:
+        content: >
+          Package: *
+          Pin: release a=stable
+          Pin-Priority: 500
+        dest: /tmp/stable
+      delegate_to: 127.0.0.1
+
+  roles:
+    - role: ansible-apt
+
+  vars_files:
+    - playbook-vars.yml

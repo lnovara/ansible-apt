@@ -1,0 +1,118 @@
+---
+
+- name: Install additional packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ apt_packages }}"
+
+- name: Remove /etc/apt/sources.list
+  file:
+    path: /etc/apt/sources.list
+    state: absent
+  when: apt_remove_sources
+
+- name: Remove every file under /etc/apt/sources.list.d
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_fileglob:
+    - "/etc/apt/sources.list.d/*"
+  when: apt_remove_sources_d
+
+- name: Remove /etc/apt/apt.conf
+  file:
+    path: /etc/apt/apt.conf
+    state: absent
+  when: apt_remove_conf
+
+- name: Remove every file under /etc/apt/apt.conf.d
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_fileglob:
+    - "/etc/apt/apt.conf.d/*"
+  when: apt_remove_conf_d
+
+- name: Remove /etc/apt/preferences
+  file:
+    path: /etc/apt/preferences
+    state: absent
+  when: apt_remove_preferences
+
+- name: Remove every file under /etc/apt/preferences.d
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_fileglob:
+    - "/etc/apt/preferences.d/*"
+  when: apt_remove_preferences_d
+
+- name: Merge default and custom APT sources
+  set_fact:
+    apt_sources: "{{ apt_sources_default }} + {{ apt_sources_custom }}"
+
+- name: Setup APT sources
+  template:
+    src: repo.sources.j2
+    dest: "/etc/apt/sources.list.d/{{ item.name }}.sources"
+    owner: root
+    group: root
+    mode: 0444
+  with_items: "{{ apt_sources }}"
+
+- name: Retrieve repository key from keyserver
+  apt_key:
+    keyserver: "{{ item.gpg_keyserver }}"
+    id: "{{ item.gpg_fingerprint }}"
+    keyring: "/usr/share/keyrings/{{ item.name }}.gpg"
+    state: present
+  with_items: "{{ apt_sources }}"
+  when: >
+    item.gpg_fingerprint is defined and item.gpg_fingerprint and
+    item.gpg_keyserver is defined and item.gpg_keyserver
+
+- name: Retrieve repository key from URL
+  apt_key:
+    url: "{{ item.gpg_url }}"
+    id: "{{ item.gpg_fingerprint }}"
+    keyring: "/usr/share/keyrings/{{ item.name }}.gpg"
+    state: present
+  with_items: "{{ apt_sources }}"
+  when: >
+    item.gpg_fingerprint is defined and item.gpg_fingerprint and
+    item.gpg_url is defined and item.gpg_url and
+    (item.gpg_keyserver is not defined or not item.gpg_keyserver)
+
+- name: Setup APT pinning for newly added sources
+  template:
+    src: repo.pin.j2
+    dest: "/etc/apt/preferences.d/{{ item.name }}"
+    owner: root
+    group: root
+    mode: 0444
+  with_items: "{{ apt_sources }}"
+  when: item.gpg_fingerprint is defined and item.gpg_fingerprint
+
+- name: Copy files under /etc/apt/apt.conf.d
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/apt/apt.conf.d/{{ item | basename }}"
+    owner: root
+    group: root
+    mode: 0444
+  with_items: "{{ apt_conf_files }}"
+
+- name: Copy files under /etc/apt/preferences.d
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/apt/preferences.d/{{ item | basename }}"
+    owner: root
+    group: root
+    mode: 0444
+  with_items: "{{ apt_preferences_files }}"
+
+- name: Update APT cache
+  apt:
+    update_cache: yes
+  changed_when: no

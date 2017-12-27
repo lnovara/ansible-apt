@@ -1,0 +1,88 @@
+---
+
+# FIXME: this duplicates parts of defaults/main.yml but it is the only way I
+# found to have all the user-facing variables in one place to write tests
+# against.
+
+# packages to provide additional functionalities
+apt_packages: ["apt-transport-https"]
+
+# remove /etc/apt/sources.list
+apt_remove_sources: yes
+
+# remove every file under /etc/apt/sources.list.d
+apt_remove_sources_d: no
+
+# remove /etc/apt/apt.conf
+apt_remove_conf: yes
+
+# remove every file under /etc/apt/apt.conf.d
+apt_remove_conf_d: no
+
+# remove /etc/apt/preferences
+apt_remove_preferences: yes
+
+# remove every file under /etc/apt/preferences.d
+apt_remove_preferences_d: no
+
+# list of default APT sources
+apt_sources_default:
+  - name: debian
+    uri: https://deb.debian.org/debian
+    suites:
+      - "{{ ansible_distribution_release | lower }}"
+    components:
+      - main
+    options: {}
+    src: yes
+    gpg_fingerprint: null
+    gpg_keyserver: null
+    gpg_url: null
+  - name: debian-security
+    uri: https://deb.debian.org/debian-security
+    suites:
+      - "{{ ansible_distribution_release | lower }}/updates"
+    components:
+      - main
+    options: {}
+    src: yes
+    gpg_fingerprint: null
+    gpg_keyserver: null
+    gpg_url: null
+
+# list of user-supplied APT sources
+apt_sources_custom:
+  - name: docker
+    uri: "https://download.docker.com/linux/{{ ansible_distribution | lower }}"
+    suites:
+      - "{{ ansible_distribution_release | lower }}"
+    components:
+      - stable
+    options:
+      Arch: amd64
+    gpg_fingerprint: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+    gpg_url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+  - name: virtualbox
+    uri: http://download.virtualbox.org/virtualbox/debian
+    suites:
+      - "{{ ansible_distribution_release | lower }}"
+    components:
+      - contrib
+    gpg_fingerprint: B9F8D658297AF3EFC18D5CDFA2F683C52980AECF
+    gpg_url: https://www.virtualbox.org/download/oracle_vbox_2016.asc
+  - name: vagrant
+    uri: https://vagrant-deb.linestarve.com
+    suites:
+      - any
+    components:
+      - main
+    gpg_fingerprint: AD319E0F7CFFA38B4D9F6E55CE3F3DE92099F7A4
+    gpg_keyserver: pgp.mit.edu
+
+# list of files to add under /etc/apt/apt.conf.d
+apt_conf_files:
+  - /tmp/99norecommends
+
+# lisr of files to add under /etc/apt/preferences.d
+apt_preferences_files:
+  - /tmp/stable
