@@ -2,6 +2,7 @@ Ansible Role: apt
 =========
 
 [![Build Status](https://travis-ci.org/lnovara/ansible-apt.svg?branch=master)](https://travis-ci.org/lnovara/ansible-apt)
+[![Ansible Galaxy](https://img.shields.io/ansible/role/23007.svg)](https://galaxy.ansible.com/lnovara/apt)
 
 Setup APT repositories, configuration snippets and pinning.
 
