@@ -3,6 +3,8 @@ import pytest
 import testinfra.utils.ansible_runner
 import yaml
 
+from distutils.version import StrictVersion
+
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
@@ -36,16 +38,24 @@ def test_apt_preferences(host, ansible_defaults):
 
 @pytest.mark.parametrize('sources', ansible_defaults()['apt_sources_default'])
 def test_apt_sources_default(host, sources):
-    print sources
+    if StrictVersion(host.system_info.release) >= StrictVersion('9.0'):
+        file_ext = ".sources"
+    else:
+        file_ext = ".list"
+
     assert host.file(os.path.join('/etc/apt/sources.list.d',
-                                  sources['name'] + ".sources")).exists
+                                  sources['name'] + file_ext)).exists
 
 
 @pytest.mark.parametrize('sources', ansible_defaults()['apt_sources_custom'])
 def test_apt_sources_custom(host, sources):
-    print sources
+    if StrictVersion(host.system_info.release) >= StrictVersion('9.0'):
+        file_ext = ".sources"
+    else:
+        file_ext = ".list"
+
     assert host.file(os.path.join('/etc/apt/sources.list.d',
-                                  sources['name'] + ".sources")).exists
+                                  sources['name'] + file_ext)).exists
 
 
 @pytest.mark.parametrize('apt_conf', ansible_defaults()['apt_conf_files'])

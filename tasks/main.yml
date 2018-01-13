@@ -70,20 +70,54 @@
   set_fact:
     apt_sources: "{{ apt_sources_default }} + {{ apt_sources_custom }}"
 
-- name: Setup APT sources
-  template:
-    src: repo.sources.j2
-    dest: "/etc/apt/sources.list.d/{{ item.name }}.sources"
-    owner: root
-    group: root
-    mode: 0444
-  with_items: "{{ apt_sources }}"
+- block:
+
+    - name: Set keyring prefix
+      set_fact:
+        apt_keyring_prefix: /usr/share/keyrings
+
+    - name: Setup APT sources
+      template:
+        src: repo.sources.j2
+        dest: "/etc/apt/sources.list.d/{{ item.name }}.sources"
+        owner: root
+        group: root
+        mode: 0444
+      with_items: "{{ apt_sources }}"
+
+  when: ansible_distribution_version | version_compare('9', '>=')
+
+
+- block:
+
+    - name: Set keyring prefix
+      set_fact:
+        apt_keyring_prefix: /etc/apt/trusted.gpg.d/
+
+    - name: Setup APT sources
+      apt_repository:
+        filename: "{{ item.name }}"
+        repo: "deb {{ item.uri }} {{ item.suites | join(' ') }} {{ item.components | join(' ') }}"
+        mode: 0444
+        state: present
+      with_items: "{{ apt_sources }}"
+
+    - name: Setup APT sources
+      apt_repository:
+        filename: "{{ item.name }}"
+        repo: "deb-src {{ item.uri }} {{ item.suites | join(' ') }} {{ item.components | join(' ') }}"
+        mode: 0444
+        state: present
+      when: item.src is defined and item.src
+      with_items: "{{ apt_sources }}"
+
+  when: ansible_distribution_version | version_compare('9', '<')
 
 - name: Retrieve repository key from keyserver
   apt_key:
     keyserver: "{{ item.gpg_keyserver }}"
     id: "{{ item.gpg_fingerprint }}"
-    keyring: "/usr/share/keyrings/{{ item.name }}.gpg"
+    keyring: "{{ apt_keyring_prefix }}/{{ item.name }}.gpg"
     state: present
   with_items: "{{ apt_sources }}"
   when: >
@@ -94,7 +128,7 @@
   apt_key:
     url: "{{ item.gpg_url }}"
     id: "{{ item.gpg_fingerprint }}"
-    keyring: "/usr/share/keyrings/{{ item.name }}.gpg"
+    keyring: "{{ apt_keyring_prefix }}/{{ item.name }}.gpg"
     state: present
   with_items: "{{ apt_sources }}"
   when: >
