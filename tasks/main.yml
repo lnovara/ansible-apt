@@ -85,7 +85,7 @@
         mode: 0444
       with_items: "{{ apt_sources }}"
 
-  when: ansible_distribution_version | version_compare('9', '>=')
+  when: ansible_distribution_version is version_compare('9', '>=')
 
 
 - block:
@@ -111,7 +111,7 @@
       when: item.src is defined and item.src
       with_items: "{{ apt_sources }}"
 
-  when: ansible_distribution_version | version_compare('9', '<')
+  when: ansible_distribution_version is version_compare('9', '<')
 
 - name: Retrieve repository key from keyserver
   apt_key:
