@@ -3,7 +3,7 @@ import pytest
 import testinfra.utils.ansible_runner
 import yaml
 
-from distutils.version import StrictVersion
+from distutils.version import LooseVersion
 
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
@@ -38,7 +38,7 @@ def test_apt_preferences(host, ansible_defaults):
 
 @pytest.mark.parametrize('sources', ansible_defaults()['apt_sources_default'])
 def test_apt_sources_default(host, sources):
-    if StrictVersion(host.system_info.release) >= StrictVersion('9.0'):
+    if LooseVersion(host.system_info.release) >= LooseVersion('9'):
         file_ext = ".sources"
     else:
         file_ext = ".list"
@@ -49,7 +49,7 @@ def test_apt_sources_default(host, sources):
 
 @pytest.mark.parametrize('sources', ansible_defaults()['apt_sources_custom'])
 def test_apt_sources_custom(host, sources):
-    if StrictVersion(host.system_info.release) >= StrictVersion('9.0'):
+    if LooseVersion(host.system_info.release) >= LooseVersion('9'):
         file_ext = ".sources"
     else:
         file_ext = ".list"

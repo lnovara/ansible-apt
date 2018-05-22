@@ -9,7 +9,7 @@ Setup APT repositories, configuration snippets and pinning.
 Requirements
 ------------
 
-None.
+An Ansible 2.4 or higher installation.
 
 Role Variables
 --------------
