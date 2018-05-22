@@ -124,13 +124,32 @@ Dependencies
 
 None.
 
+Testing
+-------
+
+This role uses [molecule](https://molecule.readthedocs.io/en/latest/) to
+implement automatic testing of its functionalities.
+
+To execute the tests
+
+```bash
+pip install tox
+
+git clone https://github.com/lnovara/ansible-apt.git
+
+cd ansible-apt
+
+# test all the scenarios
+tox
+```
+
 Example Playbook
 ----------------
 
     - name: Setup APT on all hosts.
       hosts: all
       roles:
-        - { role: lnovara.apt }
+        - role: lnovara.apt
 
 License
 -------
