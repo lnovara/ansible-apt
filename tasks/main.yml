@@ -68,7 +68,7 @@
 
 - name: Merge default and custom APT sources
   set_fact:
-    apt_sources: "{{ apt_sources_default }} + {{ apt_sources_custom }}"
+    apt_sources: "{{ apt_sources_default + apt_sources_custom }}"
 
 - block:
 
